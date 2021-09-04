@@ -1,57 +1,57 @@
-import React from 'react'
-import logo from './logo.svg'
-import { Counter } from './features/counter/Counter'
+import React, {useEffect, useState} from 'react'
 import './App.css'
+import axios from 'axios'
 
 function App() {
+  const [btcTxs, setBtcTxs] = useState([])
+
+  const [ethTxs, setEthTxs] = useState([])
+  const [custodialTxs, setCustodialTxs] = useState([])
+  const [prices, setPrices] = useState([])
+
+  const getBtcTxsData = async() => {
+    const res = await axios.get('http://localhost:8888/btc-txs')
+    setBtcTxs(res.data)
+  }
+
+  const getEthTxsData = async() => {
+    const res = await axios.get('http://localhost:8888/eth-txs')
+    setEthTxs(res.data)
+  }
+
+  const getCustodialTxsData = async() => {
+    const res = await axios.get('http://localhost:8888/custodial-txs')
+    setCustodialTxs(res.data)
+  }
+
+  const gePricesData = async() => {
+    const res = await axios.get('http://localhost:8888/prices')
+    setPrices(res.data)
+  }
+
+  useEffect(() => {
+
+    (async() => {
+      await getBtcTxsData()
+      await getEthTxsData()
+      await getCustodialTxsData()
+      await gePricesData()
+    })()
+
+  }, [])
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <Counter />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <span>
-          <span>Learn </span>
-          <a
-            className="App-link"
-            href="https://reactjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux-toolkit.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux Toolkit
-          </a>
-          ,<span> and </span>
-          <a
-            className="App-link"
-            href="https://react-redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React Redux
-          </a>
-        </span>
-      </header>
-    </div>
+    <>
+      <h1>btcTxs</h1>
+      { JSON.stringify(btcTxs) }
+      <h1>ethTxs</h1>
+      { JSON.stringify(ethTxs) }
+      <h1>custodialTxs</h1>
+      { JSON.stringify(custodialTxs) }
+      <h1>prices</h1>
+      { JSON.stringify(prices) }
+    </>
   )
 }
 

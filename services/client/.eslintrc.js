@@ -48,6 +48,8 @@ module.exports = {
     ],
     'one-var-declaration-per-line': ['error', 'initializations'],
     'react-hooks/exhaustive-deps': 'off',
-    'react/prop-types': 0
+    'react/prop-types': 0,
+    'react/jsx-uses-react': 'error',
+    'react/jsx-uses-vars': 'error'
   }
 }
