@@ -1,7 +1,6 @@
 const express = require('express')
 const cors = require('cors')
 
-// data mocks
 const btcTxMock = require('./__mocks__/btc-noncustodial.json')
 const ethTxMock = require('./__mocks__/eth-noncustodial.json')
 const custodialTxMock = require('./__mocks__/custodial.json')
