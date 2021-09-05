@@ -1,8 +1,9 @@
+import dayjs from 'dayjs'
+
 
 const getHumanReadableDateTimeFromUnix = (unixTimestamp: number) => {
-  const dateObject = new Date((unixTimestamp * 1000))
-  const humanDateFormat = dateObject.toLocaleString()
-  return humanDateFormat
+  const formattedDate = dayjs.unix(unixTimestamp).format('YYYY-MM-DDTHH:mm:ss[Z]')
+  return formattedDate
 }
 
 export default getHumanReadableDateTimeFromUnix

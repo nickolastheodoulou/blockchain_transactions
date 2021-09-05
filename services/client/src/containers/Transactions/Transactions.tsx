@@ -1,6 +1,8 @@
 import React, {useEffect, useState} from 'react'
 import axios from 'axios'
 import getHumanReadableDateTimeFromUnix from '../../helperFunctions/getHumanReadableDateTimeFromUnix'
+import convertSatToBtc from '../../helperFunctions/convertSatToBtc'
+import convertWeiToEth from '../../helperFunctions/convertWeiToEth'
 
 interface ITransactionData {
     description: string;
@@ -25,6 +27,7 @@ interface IBtcNonCustodial {
 }
 
 interface IEthNonCustodial {
+  amount: number;
   hash: string;
   txFee: string;
   blockHeight: string;
@@ -32,9 +35,12 @@ interface IEthNonCustodial {
 }
 
 interface ICustodial {
+  pair: string;
+  fiatValue: string;
   createdAt: string;
   id: string;
 }
+
 
 const Transactions = () => {
   const initialPriceState = {
@@ -43,7 +49,9 @@ const Transactions = () => {
   }
 
   const [prices, setPrices] = useState(initialPriceState)
-  const [transactionData, setTransactionData] = useState<ITransactionData[]>([])
+  const [btcTxtData, setBtcTxtData] = useState<ITransactionData[]>([])
+  const [EthTxtData, setEthTxtData] = useState<ITransactionData[]>([])
+  const [custodialTxsData, setCustodialTxsData] = useState<ITransactionData[]>([])
 
 
   const getBtcTxsData = async() => {
@@ -51,22 +59,25 @@ const Transactions = () => {
 
     const formattedTransactionsData = res.data.map((transactionData: IBtcNonCustodial) => {
       // eslint-disable-next-line no-unused-vars
-      const {hash, ...filteredTransactionData } = transactionData  // spread operator to drop the hash ket value par in the objet
+      const {hash, coin, amount, ...filteredTransactionData } = transactionData  // spread operator to drop the hash ket value par in the objet
       return{
         ...filteredTransactionData,
+        isCustodial: false,
         data: null,
         erc20: null,
         pair: null,
         state: null,
-        fiatValue: null,
         fiatCurrency: null,
         version: null,
+        'coin(s)': transactionData.coin,
+        'Amount (Crypto)':convertSatToBtc(transactionData.amount),
+        'Amount (Fiat)':convertSatToBtc(transactionData.amount) * prices.BTC,
         hash_or_transaction_id: transactionData.hash,
         insertedAt: getHumanReadableDateTimeFromUnix(transactionData.insertedAt),
       }
     })
 
-    setTransactionData(prevState => ([...prevState, ...formattedTransactionsData]))
+    setBtcTxtData([...formattedTransactionsData])
   }
 
   const getEthTxsData = async() => {
@@ -74,19 +85,21 @@ const Transactions = () => {
 
     const formattedTransactionsData = res.data.map((transactionData: IEthNonCustodial) => {
       // eslint-disable-next-line no-unused-vars
-      const {hash, ...filteredTransactionData } = transactionData  // spread operator to drop the hash ket value par in the objet
+      const {hash, amount, ...filteredTransactionData } = transactionData  // spread operator to drop the hash ket value par in the objet
       return{
         ...filteredTransactionData,
-        coin: 'ETH',
+        isCustodial: false,
         double_spend: null,
         fromWatchOnly: null,
         toAddress: null,
         toWatchOnly: null,
         pair: null,
         state: null,
-        fiatValue: null,
         fiatCurrency: null,
         version: null,
+        'coin(s)':'ETH',
+        'Amount (Crypto)':convertWeiToEth(transactionData.amount),
+        'Amount (Fiat)':convertWeiToEth(transactionData.amount) * prices.ETH,
         hash_or_transaction_id: transactionData.hash,
         blockHeight: parseInt(transactionData.blockHeight),
         txFee: parseInt(transactionData.txFee),
@@ -94,7 +107,7 @@ const Transactions = () => {
       }
     })
 
-    setTransactionData(prevState => ([...prevState, ...formattedTransactionsData]))
+    setEthTxtData([...formattedTransactionsData])
   }
 
   const getCustodialTxsData = async() => {
@@ -102,12 +115,11 @@ const Transactions = () => {
 
     const formattedTransactionsData = res.data.map((transactionData: ICustodial) => {
       // eslint-disable-next-line no-unused-vars
-      const {id, createdAt, ...filteredTransactionData } = transactionData  // spread operator to drop the hash ket value par in the objet
+      const {id, createdAt, fiatValue, pair, ...filteredTransactionData } = transactionData  // spread operator to drop the hash ket value par in the objet
       return{
         ...filteredTransactionData,
-        amount: null,
+        isCustodial: true,
         blockHeight: null,
-        coin: null,
         double_spend: null,
         from: null,
         fromWatchOnly: null,
@@ -116,12 +128,14 @@ const Transactions = () => {
         toWatchOnly: null,
         data: null,
         erc20: null,
+        'coin(s)': transactionData.pair,
+        'Amount (Fiat)': parseFloat(transactionData.fiatValue),
+        // amount crypto needs to be calculated dynamically as it's either ETH or BTC
         hash_or_transaction_id: transactionData.id,
         insertedAt: transactionData.createdAt,
       }
     })
-
-    setTransactionData(prevState => ([...prevState, ...formattedTransactionsData]))
+    setCustodialTxsData([...formattedTransactionsData])
 
   }
 
@@ -138,16 +152,25 @@ const Transactions = () => {
       await getBtcTxsData()
       await getEthTxsData()
       await getCustodialTxsData()
-      await gePricesData()
     })()
 
+  }, [prices])
+
+  useEffect(() => {
+    (async() => {
+      await gePricesData()
+    })()
   }, [])
 
 
   return (
     <>
-      <h1>transactionData</h1>
-      { JSON.stringify(transactionData) }
+      <h1>btcTxtData</h1>
+      { JSON.stringify(btcTxtData) }
+      <h1>EthTxtData</h1>
+      { JSON.stringify(EthTxtData) }
+      <h1>custodialTxsData</h1>
+      { JSON.stringify(custodialTxsData) }
       <h1>prices</h1>
       { JSON.stringify(prices) }
     </>
