@@ -1,9 +1,9 @@
+import roundTo8Decimals from './roundTo8Decimals'
 
 const convertWeiToEth = (wei:number) => {
   const weiToEthConversionFactor = 0.000000000000000001
   const eth = wei * weiToEthConversionFactor
-  const roundedEth = Math.round(eth * 100000000) / 100000000 // simplest way I found to guarantee we round to 8 decimal points
-  return roundedEth
+  return roundTo8Decimals(eth)
 }
 
 export default convertWeiToEth

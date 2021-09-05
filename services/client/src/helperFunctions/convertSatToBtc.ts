@@ -1,8 +1,9 @@
+import roundTo8Decimals from './roundTo8Decimals'
+
 const convertSatToBtc = (sat:number) => {
   const satToBtcConversionFactor = 0.00000001
   const btc = sat * satToBtcConversionFactor
-  const roundedBtc = Math.round(btc * 100000000) / 100000000 // simplest way I found to guarantee we round to 8 decimal points
-  return roundedBtc
+  return roundTo8Decimals(btc)
 }
 
 export default convertSatToBtc

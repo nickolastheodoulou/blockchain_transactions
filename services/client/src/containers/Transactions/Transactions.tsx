@@ -3,10 +3,7 @@ import axios from 'axios'
 import getHumanReadableDateTimeFromUnix from '../../helperFunctions/getHumanReadableDateTimeFromUnix'
 import convertSatToBtc from '../../helperFunctions/convertSatToBtc'
 import convertWeiToEth from '../../helperFunctions/convertWeiToEth'
-
-interface ITransactionData {
-    description: string;
-}
+import getAmountInCryptoFromFiat from '../../helperFunctions/getAmountInCryptoFromFiat'
 
 interface IBtcNonCustodial {
   type: string;
@@ -48,30 +45,35 @@ const Transactions = () => {
     'ETH' : 0
   }
 
+  // This stores the price data
   const [prices, setPrices] = useState(initialPriceState)
-  const [btcTxtData, setBtcTxtData] = useState<ITransactionData[]>([])
-  const [EthTxtData, setEthTxtData] = useState<ITransactionData[]>([])
-  const [custodialTxsData, setCustodialTxsData] = useState<ITransactionData[]>([])
+
+  // These states hold the transaction data
+  const [btcTxtData, setBtcTxtData] = useState<IBtcNonCustodial[]>([])
+  const [EthTxtData, setEthTxtData] = useState<IEthNonCustodial[]>([])
+  const [custodialTxsData, setCustodialTxsData] = useState<ICustodial[]>([])
+
 
 
   const getBtcTxsData = async() => {
+
+    // TODO wrap in try catch. Then set toast to show if failed
     const res = await axios.get('http://localhost:8888/btc-txs')
 
     const formattedTransactionsData = res.data.map((transactionData: IBtcNonCustodial) => {
       // eslint-disable-next-line no-unused-vars
-      const {hash, coin, amount, ...filteredTransactionData } = transactionData  // spread operator to drop the hash ket value par in the objet
+      const {hash, coin, amount, ...filteredTransactionData } = transactionData  // spread operator to drop the key value pairs not included in filteredTransactionData
       return{
         ...filteredTransactionData,
         isCustodial: false,
         data: null,
         erc20: null,
-        pair: null,
         state: null,
         fiatCurrency: null,
         version: null,
         'coin(s)': transactionData.coin,
         'Amount (Crypto)':convertSatToBtc(transactionData.amount),
-        'Amount (Fiat)':convertSatToBtc(transactionData.amount) * prices.BTC,
+        'Amount (Fiat)':prices.BTC * convertSatToBtc(transactionData.amount),
         hash_or_transaction_id: transactionData.hash,
         insertedAt: getHumanReadableDateTimeFromUnix(transactionData.insertedAt),
       }
@@ -81,11 +83,12 @@ const Transactions = () => {
   }
 
   const getEthTxsData = async() => {
+    // TODO wrap in try catch. Then set toast to show if failed
     const res = await axios.get('http://localhost:8888/eth-txs')
 
     const formattedTransactionsData = res.data.map((transactionData: IEthNonCustodial) => {
       // eslint-disable-next-line no-unused-vars
-      const {hash, amount, ...filteredTransactionData } = transactionData  // spread operator to drop the hash ket value par in the objet
+      const {hash, amount, ...filteredTransactionData } = transactionData // spread operator to drop the key value pairs not included in filteredTransactionData
       return{
         ...filteredTransactionData,
         isCustodial: false,
@@ -93,13 +96,12 @@ const Transactions = () => {
         fromWatchOnly: null,
         toAddress: null,
         toWatchOnly: null,
-        pair: null,
         state: null,
         fiatCurrency: null,
         version: null,
         'coin(s)':'ETH',
         'Amount (Crypto)':convertWeiToEth(transactionData.amount),
-        'Amount (Fiat)':convertWeiToEth(transactionData.amount) * prices.ETH,
+        'Amount (Fiat)':prices.ETH * convertWeiToEth(transactionData.amount),
         hash_or_transaction_id: transactionData.hash,
         blockHeight: parseInt(transactionData.blockHeight),
         txFee: parseInt(transactionData.txFee),
@@ -110,12 +112,15 @@ const Transactions = () => {
     setEthTxtData([...formattedTransactionsData])
   }
 
+
   const getCustodialTxsData = async() => {
+    // TODO wrap in try catch. Then set toast to show if failed
     const res = await axios.get('http://localhost:8888/custodial-txs')
 
     const formattedTransactionsData = res.data.map((transactionData: ICustodial) => {
       // eslint-disable-next-line no-unused-vars
-      const {id, createdAt, fiatValue, pair, ...filteredTransactionData } = transactionData  // spread operator to drop the hash ket value par in the objet
+      const {id, createdAt, fiatValue, pair, ...filteredTransactionData } = transactionData  // spread operator to drop the key value pairs not included in filteredTransactionData
+
       return{
         ...filteredTransactionData,
         isCustodial: true,
@@ -130,7 +135,7 @@ const Transactions = () => {
         erc20: null,
         'coin(s)': transactionData.pair,
         'Amount (Fiat)': parseFloat(transactionData.fiatValue),
-        // amount crypto needs to be calculated dynamically as it's either ETH or BTC
+        'Amount (Crypto)': getAmountInCryptoFromFiat(pair, parseFloat(transactionData.fiatValue), prices),
         hash_or_transaction_id: transactionData.id,
         insertedAt: transactionData.createdAt,
       }
@@ -165,14 +170,17 @@ const Transactions = () => {
 
   return (
     <>
+      <h1>prices</h1>
+      { JSON.stringify(prices) }
+      <h1>Combined</h1>
+      { JSON.stringify([...btcTxtData, ...EthTxtData, ...custodialTxsData]) }
       <h1>btcTxtData</h1>
       { JSON.stringify(btcTxtData) }
       <h1>EthTxtData</h1>
       { JSON.stringify(EthTxtData) }
       <h1>custodialTxsData</h1>
       { JSON.stringify(custodialTxsData) }
-      <h1>prices</h1>
-      { JSON.stringify(prices) }
+
     </>
   )
 }
