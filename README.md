@@ -13,3 +13,21 @@ Run the command
 ```shell
 docker-compose down --remove-orphans && docker container prune -f
 ```
+
+
+## How to run the unit tests
+<sup>Note automatic testing for this dockererised project has not been enabled and will need to be run manually</sup>
+
+In the root directory run the following commands to test the client:
+1) Go to the client directory
+```shell
+cd services/client        
+```
+2) Shell into the docker container
+```shell
+docker exec -it client /bin/sh
+```
+3) Run the tests
+```shell
+yarn test  
+```
