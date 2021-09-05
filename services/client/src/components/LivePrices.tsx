@@ -1,5 +1,5 @@
-import BodyPaper from './BodyPaper'
 import React from 'react'
+import ComponentPaper from './ComponentPaper'
 
 interface IPrices {
   BTC: number;
@@ -9,11 +9,11 @@ interface IPrices {
 const LivePrices = (props: { prices: IPrices }) => {
   const { prices } = props
   return(
-    <BodyPaper>
+    <ComponentPaper>
       <h2>Current Prices</h2>
-      <h3>BTC: {prices.BTC}</h3>
-      <h3>ETH: {prices.ETH}</h3>
-    </BodyPaper>
+      <p>BTC: ${prices.BTC}</p>
+      <p>ETH: ${prices.ETH}</p>
+    </ComponentPaper>
   )
 }
 

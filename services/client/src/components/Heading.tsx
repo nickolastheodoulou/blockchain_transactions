@@ -1,12 +1,15 @@
 import React from 'react'
-import BodyPaper from './BodyPaper'
+import ComponentPaper from './ComponentPaper'
+
+
 
 const Heading = () => {
   return(
-    <BodyPaper>
-      <h1>Transaction History</h1>
-    </BodyPaper>
+    <ComponentPaper style={{marginBottom: '10px'}}>
+      <h1>Your Transactions Page</h1>
+    </ComponentPaper>
   )
 }
 
 export default Heading
+

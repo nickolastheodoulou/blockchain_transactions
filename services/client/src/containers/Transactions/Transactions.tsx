@@ -5,9 +5,10 @@ import convertSatToBtc from '../../helperFunctions/convertSatToBtc'
 import convertWeiToEth from '../../helperFunctions/convertWeiToEth'
 import getAmountInCryptoFromFiat from '../../helperFunctions/getAmountInCryptoFromFiat'
 import ProgressSpinner from '../../components/ProgressSpinner'
-import TransactionTable from '../../components/TransactionTable'
+import TransactionTable from '../../components/TransactionTable/TransactionTable'
 import Heading from '../../components/Heading'
 import LivePrices from '../../components/LivePrices'
+import BodyPaper from '../../components/BodyPaper'
 
 interface IBtcNonCustodial {
   type: string;
@@ -185,10 +186,12 @@ const Transactions = () => {
 
   return (
     <>
-      <Heading/>
-      <LivePrices
-        prices={prices}
-      />
+      <BodyPaper>
+        <Heading/>
+        <LivePrices
+          prices={prices}
+        />
+      </BodyPaper>
       <TransactionTable
         data={[...btcTxtData, ...EthTxtData, ...custodialTxsData]}
       />
