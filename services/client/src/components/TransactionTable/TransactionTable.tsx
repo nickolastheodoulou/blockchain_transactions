@@ -20,7 +20,7 @@ const TransactionTable = ({data}) => {
     return (
       <div className="table-header">
         List of Transactions
-        <span style={{ marginLeft: '10px'}} className="p-input-icon-left">
+        <span style={{ marginLeft: '10px', marginTop: '10px'}} className="p-input-icon-left">
           <i className="pi pi-search" />
           <InputText
 
@@ -29,13 +29,15 @@ const TransactionTable = ({data}) => {
             onInput={handleOnInput}
             placeholder="Global Search"
           />
-          <Button
-            style={{ float: 'right', marginLeft: '10px'}}
-            onClick={handleOnClickShowAll}
-          >
-            {showAll ? 'Show Overview': 'Show All Columns'}
-          </Button>
         </span>
+
+
+        <Button
+          style={{ marginLeft: '10px', marginTop: '10px'}}
+          onClick={handleOnClickShowAll}
+        >
+          {showAll ? 'Show Overview': 'Show All Columns'}
+        </Button>
       </div>
     )
   }
@@ -43,10 +45,9 @@ const TransactionTable = ({data}) => {
   const header = renderHeader()
 
 
+  // TODO conditionally render just the columns
   return(
     <BodyPaper>
-
-
       <div className="datatable-doc-demo">
         <div className="card">
           { showAll && (
@@ -76,8 +77,14 @@ const TransactionTable = ({data}) => {
               <Column style={{width:'400px'}} sortable field="from" header="From" filter filterPlaceholder="Search by From"/>
               <Column style={{width:'250px'}} sortable field='status' header="Status" filter filterPlaceholder="Search by Status"/>
               <Column style={{width:'250px'}} sortable field='type' header="Type" filter filterPlaceholder="Search by Type"/>
+
               <Column style={{width:'250px'}} sortable field="description" header="Description" filter filterPlaceholder="Search by Description" />
               <Column style={{width:'210px'}} sortable field="blockHeight" header="Block Height" filter filterPlaceholder="Search by Block Height"/>
+              <Column style={{width:'210px'}} sortable field="double_spend" header="Double Spend" filter filterPlaceholder="Search by Double Spend"/>
+              <Column style={{width:'210px'}} sortable field="fromWatchOnly" header="From Watch Only" filter filterPlaceholder="Search by From Watch Only"/>
+              <Column style={{width:'210px'}} sortable field="txFee (Crypto)" header="Transaction Fee (Crypto)" />
+              <Column style={{width:'210px'}} sortable field="version" header="Version" filter filterPlaceholder="Search by Version"/>
+
             </DataTable>
           )}
 
