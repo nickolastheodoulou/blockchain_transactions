@@ -1,57 +1,19 @@
-import React, {useEffect, useState} from 'react'
+import React from 'react'
 import './App.css'
-import axios from 'axios'
+import 'primeicons/primeicons.css'
+import 'primereact/resources/themes/vela-orange/theme.css'
+import 'primereact/resources/primereact.css'
+import 'primeflex/primeflex.css'
+import Transactions from './containers/Transactions/Transactions'
+import PrimeReact from 'primereact/api'
 
 function App() {
-  const [btcTxs, setBtcTxs] = useState([])
+  PrimeReact.ripple = true
 
-  const [ethTxs, setEthTxs] = useState([])
-  const [custodialTxs, setCustodialTxs] = useState([])
-  const [prices, setPrices] = useState([])
-
-  const getBtcTxsData = async() => {
-    const res = await axios.get('http://localhost:8888/btc-txs')
-    setBtcTxs(res.data)
-  }
-
-  const getEthTxsData = async() => {
-    const res = await axios.get('http://localhost:8888/eth-txs')
-    setEthTxs(res.data)
-  }
-
-  const getCustodialTxsData = async() => {
-    const res = await axios.get('http://localhost:8888/custodial-txs')
-    setCustodialTxs(res.data)
-  }
-
-  const gePricesData = async() => {
-    const res = await axios.get('http://localhost:8888/prices')
-    setPrices(res.data)
-  }
-
-  useEffect(() => {
-
-    (async() => {
-      await getBtcTxsData()
-      await getEthTxsData()
-      await getCustodialTxsData()
-      await gePricesData()
-    })()
-
-  }, [])
-
-
-  return (
-    <>
-      <h1>btcTxs</h1>
-      { JSON.stringify(btcTxs) }
-      <h1>ethTxs</h1>
-      { JSON.stringify(ethTxs) }
-      <h1>custodialTxs</h1>
-      { JSON.stringify(custodialTxs) }
-      <h1>prices</h1>
-      { JSON.stringify(prices) }
-    </>
+  return(
+    <div>
+      <Transactions />
+    </div>
   )
 }
 

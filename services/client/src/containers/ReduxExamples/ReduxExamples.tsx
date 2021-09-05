@@ -1,6 +1,6 @@
 import React from 'react'
 import logo from '../logo.svg'
-import {Counter} from '../features/counter/Counter'
+import {Counter} from '../../features/counter/Counter'
 import './ReduxExamples.tsx.css'
 
 const ReduxExamples = () => {
@@ -56,3 +56,4 @@ const ReduxExamples = () => {
 }
 
 export default ReduxExamples
+
