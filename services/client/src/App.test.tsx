@@ -7,6 +7,6 @@ test('renders learn react link', () => {
     <App />
   )
 
-  expect(getByText(/prices/)).toBeInTheDocument()
+  expect(getByText(/Your Transactions Page/)).toBeInTheDocument()
 
 })
