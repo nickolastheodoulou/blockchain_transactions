@@ -31,3 +31,6 @@ docker exec -it client /bin/sh
 ```shell
 yarn test  
 ```
+
+## Overview of the project
+
