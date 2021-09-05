@@ -11,7 +11,9 @@ function App() {
   PrimeReact.ripple = true
 
   return(
-    <Transactions />
+    <div>
+      <Transactions />
+    </div>
   )
 }
 

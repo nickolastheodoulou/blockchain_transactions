@@ -4,6 +4,10 @@ import getHumanReadableDateTimeFromUnix from '../../helperFunctions/getHumanRead
 import convertSatToBtc from '../../helperFunctions/convertSatToBtc'
 import convertWeiToEth from '../../helperFunctions/convertWeiToEth'
 import getAmountInCryptoFromFiat from '../../helperFunctions/getAmountInCryptoFromFiat'
+import ProgressSpinner from '../../components/ProgressSpinner'
+import TransactionTable from '../../components/TransactionTable'
+import Heading from '../../components/Heading'
+import LivePrices from '../../components/LivePrices'
 
 interface IBtcNonCustodial {
   type: string;
@@ -53,12 +57,16 @@ const Transactions = () => {
   const [EthTxtData, setEthTxtData] = useState<IEthNonCustodial[]>([])
   const [custodialTxsData, setCustodialTxsData] = useState<ICustodial[]>([])
 
+  // This just sets a loading wheel if something is loading
+  const [isLoading, setIsLoading] = useState(false)
 
 
   const getBtcTxsData = async() => {
 
+    setIsLoading(true)
     // TODO wrap in try catch. Then set toast to show if failed
     const res = await axios.get('http://localhost:8888/btc-txs')
+    setIsLoading(false)
 
     const formattedTransactionsData = res.data.map((transactionData: IBtcNonCustodial) => {
       // eslint-disable-next-line no-unused-vars
@@ -83,8 +91,10 @@ const Transactions = () => {
   }
 
   const getEthTxsData = async() => {
+    setIsLoading(true)
     // TODO wrap in try catch. Then set toast to show if failed
     const res = await axios.get('http://localhost:8888/eth-txs')
+    setIsLoading(false)
 
     const formattedTransactionsData = res.data.map((transactionData: IEthNonCustodial) => {
       // eslint-disable-next-line no-unused-vars
@@ -114,8 +124,11 @@ const Transactions = () => {
 
 
   const getCustodialTxsData = async() => {
+    setIsLoading(true)
     // TODO wrap in try catch. Then set toast to show if failed
     const res = await axios.get('http://localhost:8888/custodial-txs')
+    setIsLoading(false)
+
 
     const formattedTransactionsData = res.data.map((transactionData: ICustodial) => {
       // eslint-disable-next-line no-unused-vars
@@ -145,7 +158,9 @@ const Transactions = () => {
   }
 
   const gePricesData = async() => {
+    setIsLoading(true)
     const res = await axios.get('http://localhost:8888/prices')
+    setIsLoading(false)
     setPrices(res.data)
 
 
@@ -170,17 +185,16 @@ const Transactions = () => {
 
   return (
     <>
-      <h1>prices</h1>
-      { JSON.stringify(prices) }
-      <h1>Combined</h1>
-      { JSON.stringify([...btcTxtData, ...EthTxtData, ...custodialTxsData]) }
-      <h1>btcTxtData</h1>
-      { JSON.stringify(btcTxtData) }
-      <h1>EthTxtData</h1>
-      { JSON.stringify(EthTxtData) }
-      <h1>custodialTxsData</h1>
-      { JSON.stringify(custodialTxsData) }
-
+      <Heading/>
+      <LivePrices
+        prices={prices}
+      />
+      <TransactionTable
+        data={[...btcTxtData, ...EthTxtData, ...custodialTxsData]}
+      />
+      {isLoading && (
+        <ProgressSpinner/>
+      )}
     </>
   )
 }
