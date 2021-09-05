@@ -31,7 +31,7 @@ interface IBtcNonCustodial {
 interface IEthNonCustodial {
   amount: number;
   hash: string;
-  txFee: string;
+  txFee: number;
   blockHeight: string;
   insertedAt: number;
 }
@@ -63,7 +63,6 @@ const Transactions = () => {
 
 
   const getBtcTxsData = async() => {
-
     setIsLoading(true)
     // TODO wrap in try catch. Then set toast to show if failed
     const res = await axios.get('http://localhost:8888/btc-txs')
@@ -71,7 +70,7 @@ const Transactions = () => {
 
     const formattedTransactionsData = res.data.map((transactionData: IBtcNonCustodial) => {
       // eslint-disable-next-line no-unused-vars
-      const {hash, coin, amount, ...filteredTransactionData } = transactionData  // spread operator to drop the key value pairs not included in filteredTransactionData
+      const {hash, coin, amount, txFee, ...filteredTransactionData } = transactionData  // spread operator to drop the key value pairs not included in filteredTransactionData
       return{
         ...filteredTransactionData,
         isCustodial: false,
@@ -82,7 +81,8 @@ const Transactions = () => {
         version: null,
         'coin(s)': transactionData.coin,
         'Amount (Crypto)':convertSatToBtc(transactionData.amount),
-        'Amount (Fiat)':prices.BTC * convertSatToBtc(transactionData.amount),
+        'Amount (Fiat)':`$${(prices.BTC * convertSatToBtc(transactionData.amount)).toFixed(2)}`,
+        'txFee (Crypto)': convertSatToBtc(transactionData.txFee),
         hash_or_transaction_id: transactionData.hash,
         insertedAt: getHumanReadableDateTimeFromUnix(transactionData.insertedAt),
       }
@@ -99,7 +99,7 @@ const Transactions = () => {
 
     const formattedTransactionsData = res.data.map((transactionData: IEthNonCustodial) => {
       // eslint-disable-next-line no-unused-vars
-      const {hash, amount, ...filteredTransactionData } = transactionData // spread operator to drop the key value pairs not included in filteredTransactionData
+      const {hash, amount, txFee, ...filteredTransactionData } = transactionData // spread operator to drop the key value pairs not included in filteredTransactionData
       return{
         ...filteredTransactionData,
         isCustodial: false,
@@ -112,10 +112,10 @@ const Transactions = () => {
         version: null,
         'coin(s)':'ETH',
         'Amount (Crypto)':convertWeiToEth(transactionData.amount),
-        'Amount (Fiat)':prices.ETH * convertWeiToEth(transactionData.amount),
+        'Amount (Fiat)':`$${(prices.ETH * convertWeiToEth(transactionData.amount)).toFixed(2)}`,
         hash_or_transaction_id: transactionData.hash,
         blockHeight: parseInt(transactionData.blockHeight),
-        txFee: parseInt(transactionData.txFee),
+        'txFee (Crypto)': convertWeiToEth(transactionData.txFee),
         insertedAt: getHumanReadableDateTimeFromUnix(transactionData.insertedAt),
       }
     })
@@ -148,7 +148,7 @@ const Transactions = () => {
         data: null,
         erc20: null,
         'coin(s)': transactionData.pair,
-        'Amount (Fiat)': parseFloat(transactionData.fiatValue),
+        'Amount (Fiat)':`$${(parseFloat(transactionData.fiatValue)).toFixed(2)}`,
         'Amount (Crypto)': getAmountInCryptoFromFiat(pair, parseFloat(transactionData.fiatValue), prices),
         hash_or_transaction_id: transactionData.id,
         insertedAt: transactionData.createdAt,
